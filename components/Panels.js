@@ -20,6 +20,23 @@ export function Overview({ state, R, cur }) {
   ].filter(Boolean);
   return (
     <>
+      {d.upside < -0.4 && (
+        <div className="learn" style={{ borderLeftColor: "#b3372b", background: "#fbf1ef" }}>
+          🔭 <b>Story-stock alert:</b> the market is paying far more than this company's last three years justify.
+          That usually means investors are pricing businesses that aren't in the historicals yet — new products,
+          new markets, a turnaround. This isn't a "sell" signal; it's a question. Try the reverse-DCF trick:
+          open the Bull case in Model Controls and find the growth + margins needed to reach today's price.
+          Whatever you had to type in — <i>that</i> is what buyers at this price must believe.
+        </div>
+      )}
+      {d.upside > 0.6 && (
+        <div className="learn" style={{ borderLeftColor: "#1a7a4a", background: "#eff7f1" }}>
+          🧐 <b>Too-cheap-to-be-true check:</b> the model sees far more value than the market. Before celebrating,
+          ask why: is one unusually good year inflating the margins? Unusual debt or cash items? Markets are
+          sometimes wrong — but when something looks this cheap, they usually know something the historicals
+          don't show yet. Stress the Bear case before trusting the Bull.
+        </div>
+      )}
       <div className="two-col">
         <Card title="Valuation summary — football field" right="all methods, one picture">
           <Learn>
