@@ -3,6 +3,7 @@ import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { px, pc } from "@/lib/format";
 import Logo from "@/components/Logo";
+import HeroBackdrop from "@/components/HeroBackdrop";
 
 const POPULAR = ["AAPL", "MSFT", "TSLA", "NVDA", "AMZN", "GOOGL", "META", "KO"];
 
@@ -46,30 +47,46 @@ export default function Home() {
     if (el) { el.scrollIntoView({ behavior: "smooth", block: "center" }); el.focus(); }
   };
 
+  // reveal-on-scroll
+  useEffect(() => {
+    const els = document.querySelectorAll(".reveal");
+    const io = new IntersectionObserver(
+      (entries) => entries.forEach((e) => { if (e.isIntersecting) { e.target.classList.add("in"); io.unobserve(e.target); } }),
+      { threshold: 0.15 }
+    );
+    els.forEach((el) => io.observe(el));
+    return () => io.disconnect();
+  }, []);
+
   return (
     <>
-      <header className="site-header">
-        <div className="inner">
+      {/* ---------------- CINEMATIC HERO ---------------- */}
+      <section className="cine-hero">
+        <HeroBackdrop />
+        <header className="cine-header">
           <div className="logo-wrap">
-            <Logo size={30} />
-            <div className="logo">VE<span>XA</span></div>
+            <Logo size={30} head="#f3e8d6" spark="#241610" />
+            <div className="logo" style={{ color: "#f3e8d6" }}>VE<span>XA</span></div>
           </div>
           <nav className="site-nav">
             <button onClick={() => document.getElementById("how")?.scrollIntoView({ behavior: "smooth" })}>How it works</button>
             <button onClick={focusSearch}>Start</button>
           </nav>
-        </div>
-      </header>
+        </header>
 
-      {/* ---------------- HERO ---------------- */}
-      <section className="lp-hero">
-        <div className="lp-hero-inner">
+        <div className="cine-labels">
+          <span className="cl tl">(01) &nbsp;VALUATION STUDIO</span>
+          <span className="cl tr">EST. 2026</span>
+          <span className="cl bl">NEW YORK · LONDON · REMOTE</span>
+          <span className="cl br">SCROLL ↓</span>
+        </div>
+
+        <div className="cine-inner">
           <div className="lp-eyebrow">FINANCIAL MODELING · FOR EVERYONE</div>
-          <h1 className="serif">What is any company<br />really worth?</h1>
-          <p className="lp-sub">
+          <h1 className="serif cine-h1">What is any company<br />really worth?</h1>
+          <p className="cine-sub">
             Type a ticker and Vexa loads the company's real financials, then helps you build
-            a full valuation — DCF, scenarios, M&amp;A, LBO. It's free, runs in your browser,
-            and explains each step as you go.
+            a full valuation — DCF, scenarios, M&amp;A, LBO. It's free, and it explains each step.
           </p>
           <div className="searchbox lp-search">
             <input
@@ -103,6 +120,7 @@ export default function Home() {
         </div>
       </section>
 
+      <div className="sheet-wrap">
       {saved.length > 0 && (
         <section className="lp-saved">
           <div className="lp-band-inner">
@@ -127,7 +145,7 @@ export default function Home() {
       )}
 
       {/* ---------------- PROBLEM ---------------- */}
-      <section className="lp-band">
+      <section className="lp-band reveal">
         <div className="lp-band-inner">
           <div className="smallcaps center">Why I built this</div>
           <h2 className="serif center lp-h2">Most people never learn to value a company.</h2>
@@ -150,7 +168,7 @@ export default function Home() {
       </section>
 
       {/* ---------------- HOW IT WORKS ---------------- */}
-      <section className="lp-band alt" id="how">
+      <section className="lp-band alt reveal" id="how">
         <div className="lp-band-inner">
           <div className="smallcaps center">How it works</div>
           <h2 className="serif center lp-h2">Three steps to a full model.</h2>
@@ -163,7 +181,7 @@ export default function Home() {
       </section>
 
       {/* ---------------- EXAMPLE GLIMPSE ---------------- */}
-      <section className="lp-band">
+      <section className="lp-band reveal">
         <div className="lp-band-inner">
           <div className="smallcaps center">What you get</div>
           <h2 className="serif center lp-h2">You see how the number is built.</h2>
@@ -204,7 +222,7 @@ export default function Home() {
       </section>
 
       {/* ---------------- WHO ITS FOR ---------------- */}
-      <section className="lp-band alt">
+      <section className="lp-band alt reveal">
         <div className="lp-band-inner">
           <div className="smallcaps center">Who it's for</div>
           <div className="lp-who">
@@ -221,7 +239,7 @@ export default function Home() {
       </section>
 
       {/* ---------------- STORY + FAQ ---------------- */}
-      <section className="lp-band">
+      <section className="lp-band reveal">
         <div className="lp-band-inner lp-narrow">
           <div className="smallcaps center">The story</div>
           <p className="lp-story">
@@ -253,6 +271,7 @@ export default function Home() {
           </div>
         </div>
       </section>
+      </div>{/* /sheet-wrap */}
 
       {/* ---------------- FOOTER ---------------- */}
       <footer className="lp-footer">
