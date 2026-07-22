@@ -192,7 +192,7 @@ export default function Home() {
             <ul className="lp-demo-list">
               <li><b>It's honest about hype.</b> When a stock trades way above what its numbers support, Vexa tells you — and shows you what the market must be betting on to justify the price.</li>
               <li><b>Seven kinds of analysis.</b> The 3-statement model, DCF, scenarios, sensitivity, capital raising, M&amp;A and LBO — the same ones used at investment banks.</li>
-              <li><b>Notes on every screen.</b> Each chart and table has a short note that explains what you're looking at, in normal English.</li>
+              <li><b>Notes on every screen.</b> Each chart and table has a short note explaining what it means and why it matters.</li>
               <li><b>Everything updates live.</b> Change one assumption and the whole model recalculates on the spot.</li>
             </ul>
           </div>
