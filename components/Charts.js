@@ -5,10 +5,12 @@ import {
 } from "recharts";
 import { f0, px, pc } from "@/lib/format";
 
-const INK = "#1c1917", PLUM = "#5d5d85", TAN = "#8a7364", BROWN = "#3a2620",
-  GOOD = "#1a7a4a", BAD = "#b3372b", GOLD = "#b08d3f", GREY = "#a8a29e";
+// axis/ink read from CSS vars so charts adapt to light & dark; bar colours stay brand
+const INK = "var(--c-ink)", GREY = "var(--c-axis)", GRID = "var(--c-grid)";
+const PLUM = "#6d6d9c", TAN = "#a1836a", BROWN = "#7a5c46",
+  GOOD = "#1f9a58", BAD = "#c9483b", GOLD = "#c19a45";
 
-const tip = { contentStyle: { background: "#fffdf9", border: "1px solid #e2ddd3", fontSize: 12.5, fontFamily: "inherit" } };
+const tip = { contentStyle: { background: "var(--c-surface)", border: "1px solid var(--line)", color: "var(--c-ink)", fontSize: 12.5, fontFamily: "inherit", borderRadius: 6 }, itemStyle: { color: "var(--c-ink)" }, labelStyle: { color: "var(--c-ink)" } };
 
 /** Revenue bars + FCF line — the classic operating summary chart. */
 export function RevFcfChart({ f, years }) {
@@ -16,7 +18,7 @@ export function RevFcfChart({ f, years }) {
   return (
     <ResponsiveContainer width="100%" height={230}>
       <ComposedChart data={data} margin={{ top: 12, right: 8, left: 8, bottom: 0 }}>
-        <CartesianGrid stroke="#eee8dd" vertical={false} />
+        <CartesianGrid stroke={GRID} vertical={false} />
         <XAxis dataKey="name" tick={{ fontSize: 11, fill: GREY }} axisLine={false} tickLine={false} />
         <YAxis tick={{ fontSize: 11, fill: GREY }} axisLine={false} tickLine={false} tickFormatter={f0} width={54} />
         <Tooltip {...tip} formatter={(v) => f0(v)} />
@@ -35,7 +37,7 @@ export function FootballField({ items, price, cur }) {
   return (
     <ResponsiveContainer width="100%" height={items.length * 46 + 40}>
       <BarChart data={data} layout="vertical" margin={{ top: 6, right: 40, left: 10, bottom: 0 }}>
-        <CartesianGrid stroke="#eee8dd" horizontal={false} />
+        <CartesianGrid stroke={GRID} horizontal={false} />
         <XAxis type="number" tick={{ fontSize: 11, fill: GREY }} tickFormatter={(v) => px(v, cur)} domain={["auto", "auto"]} axisLine={false} tickLine={false} />
         <YAxis type="category" dataKey="name" width={150} tick={{ fontSize: 12, fill: INK }} axisLine={false} tickLine={false} />
         <Tooltip {...tip} formatter={(v, n, p) => (n === "span" ? `${px(p.payload.lo, cur)} – ${px(p.payload.hi, cur)}` : null)} labelFormatter={(l) => l} />
@@ -63,7 +65,7 @@ export function Waterfall({ steps, cur }) {
   return (
     <ResponsiveContainer width="100%" height={250}>
       <BarChart data={data} margin={{ top: 18, right: 8, left: 8, bottom: 0 }}>
-        <CartesianGrid stroke="#eee8dd" vertical={false} />
+        <CartesianGrid stroke={GRID} vertical={false} />
         <XAxis dataKey="name" tick={{ fontSize: 10.5, fill: GREY }} interval={0} axisLine={false} tickLine={false} />
         <YAxis tick={{ fontSize: 11, fill: GREY }} tickFormatter={f0} axisLine={false} tickLine={false} width={56} />
         <Tooltip {...tip} formatter={(v, n, p) => (n === "val" ? f0(p.payload.raw) : null)} />
@@ -86,7 +88,7 @@ export function Tornado({ t, cur }) {
   return (
     <ResponsiveContainer width="100%" height={data.length * 40 + 40}>
       <BarChart data={data} layout="vertical" margin={{ top: 6, right: 30, left: 10, bottom: 0 }}>
-        <CartesianGrid stroke="#eee8dd" horizontal={false} />
+        <CartesianGrid stroke={GRID} horizontal={false} />
         <XAxis type="number" tick={{ fontSize: 11, fill: GREY }} tickFormatter={(v) => (v >= 0 ? "+" : "") + px(v, cur).replace(cur, cur)} axisLine={false} tickLine={false} />
         <YAxis type="category" dataKey="name" width={170} tick={{ fontSize: 11.5, fill: INK }} axisLine={false} tickLine={false} />
         <Tooltip {...tip} formatter={(v, n, p) => (n === "span" ? `${px(p.payload.lo + t.base, cur)} to ${px(p.payload.hi + t.base, cur)}` : null)} />
@@ -108,7 +110,7 @@ export function ScenarioPaths({ scenarios, years, histRev }) {
   return (
     <ResponsiveContainer width="100%" height={230}>
       <ComposedChart data={data} margin={{ top: 10, right: 8, left: 8, bottom: 0 }}>
-        <CartesianGrid stroke="#eee8dd" vertical={false} />
+        <CartesianGrid stroke={GRID} vertical={false} />
         <XAxis dataKey="name" tick={{ fontSize: 11, fill: GREY }} axisLine={false} tickLine={false} />
         <YAxis tick={{ fontSize: 11, fill: GREY }} tickFormatter={f0} axisLine={false} tickLine={false} width={56} />
         <Tooltip {...tip} formatter={f0} />
@@ -132,7 +134,7 @@ export function DebtPaydown({ lbo, years }) {
   return (
     <ResponsiveContainer width="100%" height={240}>
       <AreaChart data={data} margin={{ top: 10, right: 8, left: 8, bottom: 0 }}>
-        <CartesianGrid stroke="#eee8dd" vertical={false} />
+        <CartesianGrid stroke={GRID} vertical={false} />
         <XAxis dataKey="name" tick={{ fontSize: 11, fill: GREY }} axisLine={false} tickLine={false} />
         <YAxis tick={{ fontSize: 11, fill: GREY }} tickFormatter={f0} axisLine={false} tickLine={false} width={56} />
         <Tooltip {...tip} formatter={f0} />

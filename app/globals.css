@@ -15,6 +15,12 @@
   --serif: "Fraunces", Georgia, "Times New Roman", serif;   /* editorial display headings */
   --sans: "Space Grotesk", -apple-system, Helvetica, Arial, sans-serif; /* body / UI — distinctive grotesk */
   --mono: "IBM Plex Mono", "SF Mono", Consolas, monospace;  /* tabular figures */
+  /* chart tokens — adapt to theme */
+  --c-axis: #7a716a;
+  --c-grid: #e7e1d6;
+  --c-ink: #1c1917;
+  --c-surface: #fffdf9;
+  --band-alt: #efe9dd;
 }
 /* ---------- dark theme ---------- */
 html[data-theme="dark"] {
@@ -26,6 +32,11 @@ html[data-theme="dark"] {
   --head: #241c15;
   --navy: #e6c48f;
   --plum: #9a9ac2;
+  --c-axis: #a6988a;
+  --c-grid: #2f261d;
+  --c-ink: #ece3d6;
+  --c-surface: #201913;
+  --band-alt: #1a140f;
 }
 html[data-theme="dark"] body { background: var(--cream); }
 html[data-theme="dark"] .badge.up { background: #16351f; }
@@ -79,7 +90,7 @@ a { color: inherit; text-decoration: none; }
 /* ---------- tables ---------- */
 table.fin { width: 100%; border-collapse: collapse; font-variant-numeric: tabular-nums; }
 table.fin td:not(:first-child) { font-family: var(--mono); font-size: 12.5px; }
-table.fin thead th { position: sticky; top: 60px; background: var(--head); z-index: 4; }
+table.fin thead th { background: var(--head); }
 table.fin tbody tr { transition: background 0.14s ease; }
 table.fin tbody tr:hover td { background: rgba(58, 38, 32, 0.045); }
 html[data-theme="dark"] table.fin tbody tr:hover td { background: rgba(255, 255, 255, 0.04); }
@@ -135,6 +146,7 @@ table.fin tr.section td { font-size: 10.5px; letter-spacing: 0.12em; text-transf
 /* ---------- heatmap ---------- */
 .heat { width: 100%; border-collapse: collapse; font-variant-numeric: tabular-nums; font-family: var(--mono); }
 .heat th, .heat td { padding: 6px 8px; text-align: right; font-size: 12.5px; border: 1px solid var(--paper); }
+.heat td { color: #241a10; } /* cells are always light warm — keep text dark in both themes */
 .heat th { background: var(--cream); font-weight: 600; color: var(--grey); font-size: 11px; }
 .heat td.base { outline: 2px solid var(--brown); font-weight: 700; }
 
@@ -195,12 +207,12 @@ html[data-theme="dark"] .skel { background: linear-gradient(90deg, #2a2119 25%, 
 .lp-hero .chips button:hover { background: rgba(255,255,255,0.14); border-color: var(--gold); }
 @media (max-width: 640px) { .lp-hero h1 { font-size: 34px; } .lp-hero { padding: 44px 18px 56px; } }
 
-.lp-saved { background: #efe9dd; border-bottom: 1px solid var(--line); padding: 24px 24px; }
+.lp-saved { background: var(--band-alt); border-bottom: 1px solid var(--line); padding: 24px 24px; }
 .saved-row { display: flex; gap: 12px; overflow-x: auto; padding: 12px 0 4px; }
 .saved-row .model-card { flex: 0 0 auto; min-width: 210px; }
 
 .lp-band { padding: 64px 24px; }
-.lp-band.alt { background: #efe9dd; }
+.lp-band.alt { background: var(--band-alt); }
 .lp-band-inner { max-width: 1000px; margin: 0 auto; }
 .center { text-align: center; }
 .lp-h2 { font-size: 30px; font-weight: 700; margin: 8px 0 30px; letter-spacing: -0.01em; }

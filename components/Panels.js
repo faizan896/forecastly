@@ -63,7 +63,7 @@ export function Overview({ state, R, cur }) {
         </Card>
       )}
       {d.upside < -0.4 && (
-        <div className="learn" style={{ borderLeftColor: "#b3372b", background: "#fbf1ef" }}>
+        <div className="learn" style={{ borderLeftColor: "#b3372b", background: "rgba(179,55,43,0.09)" }}>
           🔭 <b>Story-stock alert:</b> the market is paying far more than this company's last three years justify.
           That usually means investors are pricing businesses that aren't in the historicals yet — new products,
           new markets, a turnaround. This isn't a "sell" signal; it's a question. Try the reverse-DCF trick:
@@ -72,7 +72,7 @@ export function Overview({ state, R, cur }) {
         </div>
       )}
       {d.upside > 0.6 && (
-        <div className="learn" style={{ borderLeftColor: "#1a7a4a", background: "#eff7f1" }}>
+        <div className="learn" style={{ borderLeftColor: "#1a7a4a", background: "rgba(26,122,74,0.10)" }}>
           🧐 <b>Too-cheap-to-be-true check:</b> the model sees far more value than the market. Before celebrating,
           ask why: is one unusually good year inflating the margins? Unusual debt or cash items? Markets are
           sometimes wrong — but when something looks this cheap, they usually know something the historicals
