@@ -185,11 +185,11 @@ export function ThreeStatement({ state, R }) {
 export function DcfPanel({ state, R, cur }) {
   const d = R.base.dcf, f = R.base.f;
   const steps = [
-    { name: "PV of 5-yr FCF", value: d.pvF },
-    { name: "PV of terminal value", value: d.pvTV },
-    { name: "Enterprise value", isTotal: true },
+    { name: "PV · FCF", value: d.pvF },
+    { name: "PV · TV", value: d.pvTV },
+    { name: "EV", isTotal: true },
     { name: "Net debt", value: -d.netDebt },
-    { name: "Equity value", isTotal: true },
+    { name: "Equity", isTotal: true },
   ];
   return (
     <>
