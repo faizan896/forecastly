@@ -120,7 +120,7 @@ table.fin tr.section td { font-size: 10.5px; letter-spacing: 0.12em; text-transf
 .controls-card input[type="number"], .controls-card input[type="text"] { width: 100%; border: none; border-bottom: 1px solid var(--ink); background: transparent; font: inherit; font-size: 15px; padding: 4px 2px; outline: none; }
 .controls-card input:focus { border-bottom: 2px solid var(--brown); }
 .scen-row { display: flex; gap: 8px; margin: 10px 0 4px; }
-.scen-row button { flex: 1; border: 1px solid var(--line); background: var(--paper); font: inherit; font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; padding: 10px 0; cursor: pointer; }
+.scen-row button { flex: 1; border: 1px solid var(--line); background: var(--paper); color: var(--ink); font: inherit; font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; padding: 10px 0; cursor: pointer; }
 .scen-row button.on { background: var(--brown); color: #f5efe6; border-color: var(--brown); font-weight: 700; }
 .btn { display: inline-block; width: 100%; border: none; background: var(--brown); color: #f5efe6; font: inherit; font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase; padding: 13px 18px; cursor: pointer; text-align: center; margin-top: 16px; }
 .btn:hover { background: var(--brown-2); }
@@ -138,7 +138,7 @@ table.fin tr.section td { font-size: 10.5px; letter-spacing: 0.12em; text-transf
 .searchbox input { width: 100%; font: inherit; font-size: 16px; padding: 16px 22px; border: 1px solid var(--line); border-radius: 999px; background: var(--paper); outline: none; box-shadow: 0 2px 10px rgba(28, 25, 23, 0.06); }
 .searchbox input:focus { border-color: var(--brown); }
 .search-results { position: absolute; top: 60px; left: 0; right: 0; background: var(--paper); border: 1px solid var(--line); border-radius: 12px; box-shadow: 0 10px 30px rgba(28, 25, 23, 0.12); overflow: hidden; z-index: 50; text-align: left; max-height: 320px; overflow-y: auto; }
-.search-results button { display: flex; width: 100%; justify-content: space-between; gap: 10px; padding: 12px 18px; background: none; border: none; border-bottom: 1px solid var(--line); font: inherit; cursor: pointer; }
+.search-results button { display: flex; width: 100%; justify-content: space-between; gap: 10px; padding: 12px 18px; background: none; border: none; border-bottom: 1px solid var(--line); font: inherit; color: var(--ink); cursor: pointer; }
 .search-results button:hover { background: var(--cream); }
 .search-results .sym { font-weight: 700; }
 .search-results .exch { color: var(--grey); font-size: 12px; }
@@ -146,7 +146,7 @@ table.fin tr.section td { font-size: 10.5px; letter-spacing: 0.12em; text-transf
 .chips button { border: 1px solid var(--line); background: var(--paper); border-radius: 999px; padding: 7px 15px; font: inherit; font-size: 12.5px; cursor: pointer; color: var(--ink); }
 .chips button:hover { border-color: var(--brown); }
 .saved-grid { max-width: 980px; margin: 46px auto 80px; padding: 0 24px; display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 14px; }
-.model-card { background: var(--paper); border: 1px solid var(--line); border-radius: 10px; padding: 16px 18px; cursor: pointer; text-align: left; font: inherit; }
+.model-card { background: var(--paper); border: 1px solid var(--line); border-radius: 10px; padding: 16px 18px; cursor: pointer; text-align: left; font: inherit; color: var(--ink); }
 .model-card:hover { border-color: var(--brown); box-shadow: 0 4px 14px rgba(28, 25, 23, 0.08); }
 .model-card .nm { font-weight: 700; margin-bottom: 3px; }
 .model-card .meta { color: var(--grey); font-size: 12px; margin-bottom: 10px; }
