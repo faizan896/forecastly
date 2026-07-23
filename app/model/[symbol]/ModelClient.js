@@ -59,6 +59,8 @@ export default function ModelClient() {
   const [learnOn, setLearnOn] = useState(true);
   const [copied, setCopied] = useState(false);
   const [xlBusy, setXlBusy] = useState(false);
+  const [audit, setAudit] = useState(false);
+  const [traceKey, setTraceKey] = useState(0);
   const xlBusyRef = useRef(false);
 
   const exportXl = async () => {
@@ -182,6 +184,47 @@ export default function ModelClient() {
     },
   };
 
+  // Trace-to-input: every headline output decomposed into the exact figures behind it
+  const L = h.shares.length - 1;
+  const traces = [
+    {
+      title: "how intrinsic value per share is built",
+      rows: [
+        ["Enterprise value", `${cur}${big(d.ev)}`],
+        ["− Net debt (total debt − cash)", `${cur}${big(d.netDebt)}`],
+        ["= Equity value", `${cur}${big(d.eqV)}`],
+        ["÷ Diluted shares outstanding", `${big(h.shares[L])} M`],
+        ["= Intrinsic value / share", px(d.perShare, cur)],
+      ],
+      note: `Cross-check via the exit-multiple method: ${px(d.perShareExit, cur)} / share.`,
+    },
+    {
+      title: "how upside vs. the market is computed",
+      rows: [
+        ["Intrinsic value / share", px(d.perShare, cur)],
+        ["Current market price", px(h.price, cur)],
+        ["Upside = intrinsic ÷ price − 1", pc(d.upside)],
+      ],
+      note: d.upside >= 0
+        ? "Positive → the model sees the shares as cheaper than their fundamentals justify."
+        : "Negative → the model sees the shares as pricier than the fundamentals support.",
+    },
+    {
+      title: "how enterprise value & WACC are built",
+      rows: [
+        ["Cost of equity (rf + β·ERP)", `${pc(state.asm.rf)} + ${state.asm.beta.toFixed(2)}·${pc(state.asm.erp)} = ${pc(d.ke, 2)}`],
+        ["After-tax cost of debt", pc(d.kdAT, 2)],
+        ["Equity weight / debt weight", `${pc(d.we, 1)} / ${pc(d.wd, 1)}`],
+        ["WACC = wₑ·kₑ + w_d·k_d", pc(d.wacc, 2)],
+        ["PV of 5-yr forecast FCF", `${cur}${big(d.pvF)}`],
+        ["+ PV of terminal value", `${cur}${big(d.pvTV)}`],
+        ["= Enterprise value", `${cur}${big(d.ev)}`],
+      ],
+      note: `Terminal value is ${pc(d.tvPct, 0)} of enterprise value (terminal growth ${pc(state.asm.tg)}, held below long-run GDP).`,
+    },
+  ];
+  const openTrace = (i) => { if (audit && !notMeaningful) setTraceKey(i); };
+
   return (
     <Shell>
       <h1 className="sr-only">{h.name} ({h.symbol}) — Vexa valuation</h1>
@@ -190,9 +233,11 @@ export default function ModelClient() {
           <Wizard state={state} setAsm={(asm) => setState({ ...state, asm })} suggested={suggested} onDone={() => setWizard(false)} />
         )}
         {walk && <Walkthrough state={state} R={R} cur={cur} onClose={() => setWalk(false)} />}
-        <section className="hero">
+        <section className={"hero" + (audit && !notMeaningful ? " audit-on" : "")}>
           <div className="inner">
-            <div className="kpi">
+            <div className={"kpi" + (audit && traceKey === 0 && !notMeaningful ? " tracing" : "")}
+              onClick={() => openTrace(0)} role={audit ? "button" : undefined} tabIndex={audit ? 0 : undefined}
+              onKeyDown={(e) => { if (audit && (e.key === "Enter" || e.key === " ")) { e.preventDefault(); openTrace(0); } }}>
               <div className="smallcaps">{h.name} · intrinsic value</div>
               <div className="val">{notMeaningful ? "n/m" : <AnimatedNumber value={d.perShare} format={(x) => px(x, cur)} />}</div>
               <div className="sub" aria-live="polite">
@@ -201,12 +246,16 @@ export default function ModelClient() {
                   : <>per share · {["Base", "Bull", "Bear"][scen]} case DCF</>}
               </div>
             </div>
-            <div className="kpi">
+            <div className={"kpi" + (audit && traceKey === 1 && !notMeaningful ? " tracing" : "")}
+              onClick={() => openTrace(1)} role={audit ? "button" : undefined} tabIndex={audit ? 0 : undefined}
+              onKeyDown={(e) => { if (audit && (e.key === "Enter" || e.key === " ")) { e.preventDefault(); openTrace(1); } }}>
               <div className="smallcaps">vs. market price {px(h.price, cur)}</div>
               <div className="val" style={{ color: notMeaningful ? "#cbbfae" : d.upside >= 0 ? "#a8d5b5" : "#e8a79b" }}>{notMeaningful ? "n/m" : <AnimatedNumber value={d.upside} format={(x) => pc(x)} />}</div>
               <div className="sub">{notMeaningful ? "model doesn't fit this company" : d.upside >= 0 ? "model says undervalued" : "model says overvalued"}</div>
             </div>
-            <div className="kpi">
+            <div className={"kpi" + (audit && traceKey === 2 && !notMeaningful ? " tracing" : "")}
+              onClick={() => openTrace(2)} role={audit ? "button" : undefined} tabIndex={audit ? 0 : undefined}
+              onKeyDown={(e) => { if (audit && (e.key === "Enter" || e.key === " ")) { e.preventDefault(); openTrace(2); } }}>
               <div className="smallcaps">Enterprise value</div>
               <div className="val">{notMeaningful ? "n/m" : <>{cur}<AnimatedNumber value={d.ev} format={(x) => big(x)} /></>}</div>
               <div className="sub"><Term term="WACC" /> {pc(d.wacc, 2)} · TV {pc(d.tvPct, 0)} of value</div>
@@ -220,7 +269,30 @@ export default function ModelClient() {
             <span>{h.exchange || state.co?.exchange || "US-listed"} · {h.currency}</span>
             <span className="dot">·</span>
             <span>live price {px(h.price, cur)} via Financial Modeling Prep</span>
+            {!notMeaningful && (
+              <button className={"prov-audit" + (audit ? " on" : "")} aria-pressed={audit}
+                onClick={() => { setAudit((a) => !a); setTraceKey(0); }}>
+                {audit ? "✓ Audit mode — click a KPI to trace it" : "Trace the math →"}
+              </button>
+            )}
           </div>
+          {audit && !notMeaningful && (
+            <div className="trace-card" role="region" aria-label="Calculation trace">
+              <div className="trace-head">
+                <span className="smallcaps">Audit — {traces[traceKey].title}</span>
+                <button className="wt-close" onClick={() => setAudit(false)} aria-label="Exit audit mode">✕</button>
+              </div>
+              <table className="trace-tbl"><tbody>
+                {traces[traceKey].rows.map((r, i) => (
+                  <tr key={i} className={i === traces[traceKey].rows.length - 1 ? "tr-total" : ""}>
+                    <td>{r[0]}</td><td className="tr-val">{r[1]}</td>
+                  </tr>
+                ))}
+              </tbody></table>
+              <div className="trace-note">{traces[traceKey].note}</div>
+              <div className="trace-hint">Every figure above flows from the assumptions in Model Controls — change one and the whole chain recomputes. Click another KPI to trace it.</div>
+            </div>
+          )}
           <div className="tabbar">
             <div className="tabbar-tabs" role="tablist" aria-label="Analyses">
               {TABS.map((t) => (
