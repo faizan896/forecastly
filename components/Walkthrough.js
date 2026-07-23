@@ -22,7 +22,7 @@ export default function Walkthrough({ state, R, cur = "$", onClose }) {
   const steps = [
     {
       t: "Three statements, one connected model",
-      b: "A financial model isn't three separate tables — it's one machine. The income statement feeds the cash flow, the cash flow feeds the balance sheet, and the balance sheet must always balance. Let's follow the money through " + state.hist.name + ".",
+      b: "A financial model isn't three separate tables — it's one machine. The income statement feeds the cash flow, the cash flow feeds the balance sheet, and the balance sheet must always balance. Let's follow the money through " + (state.hist.name || "this company").replace(/\.$/, "") + ".",
       hi: { is: [], cf: [], bs: [] }, flow: null,
     },
     {
