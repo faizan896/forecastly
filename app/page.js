@@ -1,10 +1,15 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
+import { motion, useScroll, useTransform } from "framer-motion";
 import { px, pc } from "@/lib/format";
 import Logo from "@/components/Logo";
 import HeroBackdrop from "@/components/HeroBackdrop";
 import ThemeToggle from "@/components/ThemeToggle";
+import Ambient from "@/components/Ambient";
+import HowItWorks from "@/components/HowItWorks";
+import { Tilt, Magnetic } from "@/components/Motion";
+import { scrollToSel } from "@/components/SmoothScroll";
 
 const POPULAR = ["AAPL", "MSFT", "TSLA", "NVDA", "AMZN", "GOOGL", "META", "KO"];
 
@@ -36,6 +41,10 @@ export default function Home() {
     return () => clearTimeout(timer.current);
   }, [q]);
 
+  const { scrollY } = useScroll();
+  const heroY = useTransform(scrollY, [0, 700], [0, -90]);
+  const heroOp = useTransform(scrollY, [0, 560], [1, 0]);
+
   const open = (sym) => router.push(`/model/${encodeURIComponent(sym)}`);
   const removeSaved = (e, sym) => {
     e.stopPropagation();
@@ -44,8 +53,9 @@ export default function Home() {
     localStorage.setItem("vexa_models", JSON.stringify(next));
   };
   const focusSearch = () => {
+    scrollToSel(".cine-hero");
     const el = document.querySelector(".searchbox input");
-    if (el) { el.scrollIntoView({ behavior: "smooth", block: "center" }); el.focus(); }
+    if (el) setTimeout(() => el.focus(), 260);
   };
 
   // reveal-on-scroll
@@ -70,7 +80,7 @@ export default function Home() {
             <div className="logo" style={{ color: "#f3e8d6" }}>VE<span>XA</span></div>
           </div>
           <nav className="site-nav">
-            <button onClick={() => document.getElementById("how")?.scrollIntoView({ behavior: "smooth" })}>How it works</button>
+            <button onClick={() => scrollToSel("#how")}>How it works</button>
             <a href="/compare">Compare</a>
             <ThemeToggle />
             <button onClick={focusSearch}>Start</button>
@@ -84,7 +94,7 @@ export default function Home() {
           <span className="cl br">SCROLL ↓</span>
         </div>
 
-        <div className="cine-inner">
+        <motion.div className="cine-inner" style={{ y: heroY, opacity: heroOp }}>
           <div className="lp-eyebrow hin" style={{ animationDelay: "0.05s" }}>FINANCIAL MODELING · FOR EVERYONE</div>
           <h1 className="serif cine-h1">
             {["What", "is", "any", "company", "\n", "really", "worth?"].map((w, i) =>
@@ -120,16 +130,19 @@ export default function Home() {
           <div className="chips hin" style={{ animationDelay: "0.96s" }}>
             <span className="chips-label">Try:</span>
             {POPULAR.map((s) => (
-              <button key={s} onClick={() => open(s)}>{s}</button>
+              <Magnetic key={s} className="chip-mag"><button onClick={() => open(s)}>{s}</button></Magnetic>
             ))}
           </div>
-          <button className="lp-example hin" style={{ animationDelay: "1.04s" }} onClick={() => open("AAPL")}>
-            or see a finished model for Apple →
-          </button>
-        </div>
+          <Magnetic className="lp-example-mag">
+            <button className="lp-example hin" style={{ animationDelay: "1.04s" }} onClick={() => open("AAPL")}>
+              or see a finished model for Apple →
+            </button>
+          </Magnetic>
+        </motion.div>
       </section>
 
       <div className="sheet-wrap">
+      <Ambient />
       {saved.length > 0 && (
         <section className="lp-saved">
           <div className="lp-band-inner">
@@ -159,35 +172,25 @@ export default function Home() {
           <div className="smallcaps center">Why I built this</div>
           <h2 className="serif center lp-h2">Most people never learn to value a company.</h2>
           <div className="lp-cards3">
-            <div className="lp-card">
-              <div className="lp-card-tag">Courses cost a fortune</div>
-              <p>Wall Street Prep and CFI charge hundreds of dollars, then hand you a pile of Excel templates.</p>
-            </div>
-            <div className="lp-card">
-              <div className="lp-card-tag">The blank spreadsheet</div>
-              <p>YouTube teaches the theory, then leaves you staring at an empty sheet with no idea where to start. Most people give up here.</p>
-            </div>
-            <div className="lp-card">
-              <div className="lp-card-tag">Other apps hide the maths</div>
-              <p>They show you a "fair value" number and nothing else — so you can't check it, and you don't learn a thing.</p>
-            </div>
+            <Tilt className="lp-card">
+              <div className="lp-card-tag">It feels locked away</div>
+              <p>Learning to value a company usually means long courses or dense textbooks — most people never make it past the introduction.</p>
+            </Tilt>
+            <Tilt className="lp-card">
+              <div className="lp-card-tag">The blank page problem</div>
+              <p>Even once you know the theory, you're left in front of an empty model with no idea where the first number goes. That's where most people stop.</p>
+            </Tilt>
+            <Tilt className="lp-card">
+              <div className="lp-card-tag">A number with no story</div>
+              <p>It's easy to find a "fair value" figure somewhere. But if you can't see how it was built, you can't check it — and you don't learn a thing.</p>
+            </Tilt>
           </div>
           <p className="lp-turn">Vexa does it differently.</p>
         </div>
       </section>
 
-      {/* ---------------- HOW IT WORKS ---------------- */}
-      <section className="lp-band alt reveal" id="how">
-        <div className="lp-band-inner">
-          <div className="smallcaps center">How it works</div>
-          <h2 className="serif center lp-h2">Three steps to a full model.</h2>
-          <div className="steps3 lp-steps">
-            <div className="step3"><div className="n">1</div><div><b>Search a company</b><br />Type a name or ticker. Vexa pulls its last three years of financials from official filings.</div></div>
-            <div className="step3"><div className="n">2</div><div><b>Answer four questions</b><br />About growth, profit, risk and the long run. Each one already has a sensible answer filled in, so you can just adjust it.</div></div>
-            <div className="step3"><div className="n">3</div><div><b>Read your model</b><br />You get the full valuation with charts. Change any number and everything updates.</div></div>
-          </div>
-        </div>
-      </section>
+      {/* ---------------- HOW IT WORKS (pinned) ---------------- */}
+      <HowItWorks />
 
       {/* ---------------- EXAMPLE GLIMPSE ---------------- */}
       <section className="lp-band reveal">
@@ -195,7 +198,7 @@ export default function Home() {
           <div className="smallcaps center">What you get</div>
           <h2 className="serif center lp-h2">You see how the number is built.</h2>
           <div className="lp-demo">
-            <div className="lp-demo-card">
+            <Tilt className="lp-demo-card" max={3}>
               <div className="lp-demo-head">
                 <div>
                   <div className="smallcaps">Apple Inc. · intrinsic value</div>
@@ -218,7 +221,7 @@ export default function Home() {
                 ))}
                 <div className="lp-ff-price"><span>market price</span></div>
               </div>
-            </div>
+            </Tilt>
             <ul className="lp-demo-list">
               <li><b>It's honest about hype.</b> When a stock trades way above what its numbers support, Vexa tells you — and shows you what the market must be betting on to justify the price.</li>
               <li><b>Seven kinds of analysis.</b> The 3-statement model, DCF, scenarios, sensitivity, capital raising, M&amp;A and LBO — the same ones used at investment banks.</li>
@@ -226,7 +229,7 @@ export default function Home() {
               <li><b>Everything updates live.</b> Change one assumption and the whole model recalculates on the spot.</li>
             </ul>
           </div>
-          <div className="center"><button className="lp-cta" onClick={focusSearch}>Try it on a company →</button></div>
+          <div className="center"><Magnetic><button className="lp-cta" onClick={focusSearch}>Try it on a company →</button></Magnetic></div>
         </div>
       </section>
 
@@ -252,9 +255,9 @@ export default function Home() {
         <div className="lp-band-inner lp-narrow">
           <div className="smallcaps center">The story</div>
           <p className="lp-story">
-            I wanted to learn how investors actually value a company, and everything I found was either
-            a course that cost hundreds of dollars or a blank Excel file I had no idea how to fill in.
-            So I spent a while figuring it out, and then built the thing I wish I'd had at the start —
+            I wanted to understand how investors actually value a company, and every path I found was
+            either expensive or started from a blank page I had no idea how to fill in.
+            So I spent a while working it out, and then built the thing I wish I'd had at the start —
             somewhere you can pick a real company and watch a real valuation come together, one step at a time.
             It's free. If it helps even a few people get unstuck, that's enough.
           </p>

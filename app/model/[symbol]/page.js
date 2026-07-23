@@ -10,6 +10,8 @@ import ThemeToggle from "@/components/ThemeToggle";
 import { AnimatedNumber } from "@/components/Motion";
 import Term from "@/components/Term";
 import Wizard from "@/components/Wizard";
+import Walkthrough from "@/components/Walkthrough";
+import { exportModelXlsx } from "@/lib/exportXlsx";
 import { Overview, ThreeStatement, DcfPanel, ScenariosPanel, SensitivityPanel, CapPanel, MaPanel, LboPanel } from "@/components/Panels";
 
 const TABS = ["Overview", "3-Statement", "DCF", "Scenarios", "Sensitivity", "Capital Raising", "M&A", "LBO"];
@@ -33,8 +35,17 @@ export default function ModelPage() {
   const [scen, setScen] = useState(0);
   const [tab, setTab] = useState("Overview");
   const [wizard, setWizard] = useState(false);
+  const [walk, setWalk] = useState(false);
   const [learnOn, setLearnOn] = useState(true);
   const [copied, setCopied] = useState(false);
+  const [xlBusy, setXlBusy] = useState(false);
+
+  const exportXl = async () => {
+    if (!state || !R) return;
+    setXlBusy(true);
+    try { await exportModelXlsx(state, R, cur, ["Base", "Bull", "Bear"][scen]); } catch {}
+    setXlBusy(false);
+  };
 
   const share = async () => {
     if (!state) return;
@@ -145,6 +156,7 @@ export default function ModelPage() {
         {wizard && (
           <Wizard state={state} setAsm={(asm) => setState({ ...state, asm })} suggested={suggested} onDone={() => setWizard(false)} />
         )}
+        {walk && <Walkthrough state={state} R={R} cur={cur} onClose={() => setWalk(false)} />}
         <section className="hero">
           <div className="inner">
             <div className="kpi">
@@ -169,7 +181,9 @@ export default function ModelPage() {
             {TABS.map((t) => (
               <button key={t} className={tab === t ? "on" : ""} onClick={() => setTab(t)}>{t}</button>
             ))}
-            <button style={{ marginLeft: "auto" }} onClick={share}>{copied ? "✓ Link copied" : "↗ Share"}</button>
+            <button style={{ marginLeft: "auto" }} onClick={() => setWalk(true)}>▶ Walkthrough</button>
+            <button onClick={exportXl}>{xlBusy ? "…" : "⬇ Excel"}</button>
+            <button onClick={share}>{copied ? "✓ Link copied" : "↗ Share"}</button>
             <button onClick={() => setWizard(true)}>↻ Wizard</button>
           </div>
           {notMeaningful && (

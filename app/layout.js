@@ -1,4 +1,6 @@
 import "./globals.css";
+import SmoothScroll from "@/components/SmoothScroll";
+import CursorGlow from "@/components/CursorGlow";
 
 export const metadata = {
   metadataBase: new URL("https://vexa-fazis-projects-f96b2d55.vercel.app"),
@@ -32,7 +34,11 @@ export default function RootLayout({ children }) {
           rel="stylesheet"
         />
       </head>
-      <body>{children}</body>
+      <body>
+        <SmoothScroll />
+        <CursorGlow />
+        {children}
+      </body>
     </html>
   );
 }
