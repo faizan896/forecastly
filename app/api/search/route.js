@@ -2,11 +2,13 @@ import { NextResponse } from "next/server";
 
 const BASE = "https://financialmodelingprep.com/stable";
 // only these load on the free plan — filter out foreign micro-caps that would error on click
-const US = new Set(["NASDAQ", "NYSE", "AMEX", "NYSE AMERICAN", "NYSEARCA", "CBOE", "OTC"]);
+const US = new Set(["NASDAQ", "NYSE", "AMEX", "NYSE AMERICAN"]);
 const isUS = (r) => {
   const e = (r.exchange || r.exchangeShortName || r.exchangeFullName || "").toUpperCase();
-  return US.has(e) || /NASDAQ|NEW YORK|NYSE|AMERICAN/.test(e);
+  return US.has(e) || /NASDAQ|NEW YORK STOCK|NYSE|AMERICAN STOCK/.test(e);
 };
+// drop leveraged/inverse ETFs & obvious non-operating tickers by name
+const junk = (r) => /(\d[xX]|leveraged|inverse|bull |bear |etf|etn)/i.test(r.name || "");
 
 export async function GET(req) {
   const q = new URL(req.url).searchParams.get("q")?.trim();
@@ -26,8 +28,8 @@ export async function GET(req) {
     });
     // US-listed first (these actually work); exact ticker match floated to top
     const ql = q.toLowerCase();
-    const us = all.filter(isUS);
-    const list = (us.length ? us : all)
+    const us = all.filter((r) => isUS(r) && !junk(r));
+    const list = (us.length ? us : all.filter((r) => !junk(r)))
       .sort((a, b) => (b.symbol.toLowerCase() === ql ? 1 : 0) - (a.symbol.toLowerCase() === ql ? 1 : 0))
       .slice(0, 8);
     return NextResponse.json(list);
