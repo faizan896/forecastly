@@ -1,6 +1,7 @@
 "use client";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { pc } from "@/lib/format";
+import { useFocusTrap } from "@/components/useFocusTrap";
 
 /**
  * 4-step guided wizard shown the first time a company is opened.
@@ -8,6 +9,8 @@ import { pc } from "@/lib/format";
  */
 export default function Wizard({ state, setAsm, onDone, suggested }) {
   const [step, setStep] = useState(0);
+  const panelRef = useRef(null);
+  useFocusTrap(panelRef, onDone);
   const a = state.asm;
   const upd = (patch) => setAsm({ ...a, ...patch });
   const updScen = (key, idx, v) => {
@@ -108,10 +111,10 @@ export default function Wizard({ state, setAsm, onDone, suggested }) {
 
   const cur = steps[step];
   return (
-    <div className="wizard-veil">
-      <div className="wizard">
+    <div className="wizard-veil" data-lenis-prevent>
+      <div className="wizard" ref={panelRef} tabIndex={-1} role="dialog" aria-modal="true" aria-labelledby="wiz-title">
         <div className="step">{cur.tag}</div>
-        <h2 className="serif">{cur.title}</h2>
+        <h2 className="serif" id="wiz-title">{cur.title}</h2>
         <p className="exp">{cur.exp}</p>
         {cur.body}
         <div className="row">

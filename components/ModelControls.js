@@ -1,30 +1,43 @@
 "use client";
 import { pc } from "@/lib/format";
 
-/** Right-rail Markly "Model Controls" — scenario buttons + the key levers, grouped. */
-export default function ModelControls({ state, setAsm, scen, setScen, learnOn, setLearnOn }) {
-  const a = state.asm;
-  const upd = (patch) => setAsm({ ...a, ...patch });
-  const updScen = (key, v) => {
-    const arr = [...a[key]]; arr[scen] = v; upd({ [key]: arr });
-  };
-  const Num = ({ label, value, onChange, step = 1, pctv }) => (
+const slug = (s) => "ctrl-" + s.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/-+$/,"");
+
+/**
+ * Single numeric lever. Defined at MODULE scope (not inside ModelControls) so it
+ * keeps a stable component identity across re-renders — otherwise every keystroke
+ * remounts the input and drops focus.
+ */
+function Num({ label, value, onChange, step = 1, pctv }) {
+  const id = slug(label);
+  return (
     <>
-      <label className="smallcaps">{label}</label>
+      <label className="smallcaps" htmlFor={id}>{label}</label>
       <input
+        id={id}
         type="number"
+        inputMode="decimal"
         step={step}
         value={pctv ? +(value * 100).toFixed(2) : +(+value).toFixed(2)}
         onChange={(e) => onChange(pctv ? (+e.target.value || 0) / 100 : +e.target.value || 0)}
       />
     </>
   );
+}
+
+/** Right-rail "Model Controls" — scenario buttons + the key levers, grouped. */
+export default function ModelControls({ state, setAsm, scen, setScen, learnOn, setLearnOn }) {
+  const a = state.asm;
+  const upd = (patch) => setAsm({ ...a, ...patch });
+  const updScen = (key, v) => {
+    const arr = [...a[key]]; arr[scen] = v; upd({ [key]: arr });
+  };
   return (
     <div className="card controls-card">
       <h2 className="serif">Model Controls</h2>
-      <div className="scen-row">
+      <div className="scen-row" role="group" aria-label="Scenario">
         {["Base", "Bull", "Bear"].map((n, i) => (
-          <button key={n} className={scen === i ? "on" : ""} onClick={() => setScen(i)}>{n}</button>
+          <button key={n} className={scen === i ? "on" : ""} aria-pressed={scen === i} onClick={() => setScen(i)}>{n}</button>
         ))}
       </div>
       <div className="smallcaps" style={{ marginTop: 14 }}>Scenario levers — editing the {["Base", "Bull", "Bear"][scen]} case</div>

@@ -1,7 +1,8 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { big } from "@/lib/format";
+import { useFocusTrap } from "@/components/useFocusTrap";
 
 /**
  * Beginner mode — animates how the income statement, cash flow and balance sheet
@@ -53,15 +54,16 @@ export default function Walkthrough({ state, R, cur = "$", onClose }) {
   ];
 
   const s = steps[i];
+  const panelRef = useRef(null);
+  useFocusTrap(panelRef, onClose);
   useEffect(() => {
     const onKey = (e) => {
-      if (e.key === "Escape") onClose();
       if (e.key === "ArrowRight" && i < steps.length - 1) setI(i + 1);
       if (e.key === "ArrowLeft" && i > 0) setI(i - 1);
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [i, onClose, steps.length]);
+  }, [i, steps.length]);
 
   const Line = ({ id, label, val, set }) => {
     const active = set.includes(id);
@@ -85,12 +87,13 @@ export default function Walkthrough({ state, R, cur = "$", onClose }) {
   const anyIS = s.hi.is.length > 0, anyCF = s.hi.cf.length > 0, anyBS = s.hi.bs.length > 0;
 
   return (
-    <div className="wt-overlay" onClick={onClose}>
+    <div className="wt-overlay" onClick={onClose} data-lenis-prevent>
       <motion.div className="wt-panel" onClick={(e) => e.stopPropagation()}
+        ref={panelRef} tabIndex={-1} role="dialog" aria-modal="true" aria-labelledby="wt-heading"
         initial={{ opacity: 0, y: 24, scale: 0.98 }} animate={{ opacity: 1, y: 0, scale: 1 }}
         transition={{ type: "spring", stiffness: 220, damping: 26 }}>
         <div className="wt-head">
-          <div className="smallcaps">Beginner walkthrough</div>
+          <div className="smallcaps" id="wt-heading">Beginner walkthrough</div>
           <button className="wt-close" onClick={onClose} aria-label="Close">✕</button>
         </div>
 
