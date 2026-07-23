@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { rateLimit, clientIp } from "@/lib/ratelimit";
+import { checkRateLimit, clientIp } from "@/lib/ratelimit";
 
 const BASE = "https://financialmodelingprep.com/stable";
 // only these load on the free plan — filter out foreign micro-caps that would error on click
@@ -14,7 +14,7 @@ const junk = (r) => /(\d[xX]|leveraged|inverse|bull |bear |etf|etn)/i.test(r.nam
 const pref = (r) => /-P[A-Z]?$/.test(r.symbol || "");
 
 export async function GET(req) {
-  if (!rateLimit(`search:${clientIp(req)}`, { limit: 25, windowMs: 10_000 }).ok)
+  if (!(await checkRateLimit(`search:${clientIp(req)}`, { limit: 25, windowMs: 10_000 })).ok)
     return NextResponse.json({ error: "Too many requests — slow down a moment." }, { status: 429 });
   // cap length & strip anything not plausibly part of a ticker/company name
   const q = new URL(req.url).searchParams.get("q")?.trim().slice(0, 32).replace(/[^\w .&-]/g, "");

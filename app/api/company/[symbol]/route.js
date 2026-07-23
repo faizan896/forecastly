@@ -1,12 +1,12 @@
 import { NextResponse } from "next/server";
-import { rateLimit, clientIp } from "@/lib/ratelimit";
+import { checkRateLimit, clientIp } from "@/lib/ratelimit";
 
 const BASE = "https://financialmodelingprep.com/stable";
 // tickers are short and alphanumeric (plus . and - for class/preferred shares)
 const VALID_SYMBOL = /^[A-Z0-9.\-]{1,10}$/;
 
 export async function GET(req, { params }) {
-  if (!rateLimit(`company:${clientIp(req)}`, { limit: 30, windowMs: 10_000 }).ok)
+  if (!(await checkRateLimit(`company:${clientIp(req)}`, { limit: 30, windowMs: 10_000 })).ok)
     return NextResponse.json({ error: "Too many requests — slow down a moment." }, { status: 429 });
   const symbol = decodeURIComponent(params.symbol || "").toUpperCase().trim();
   if (!VALID_SYMBOL.test(symbol))

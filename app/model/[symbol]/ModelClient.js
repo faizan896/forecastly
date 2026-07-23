@@ -1,8 +1,9 @@
 "use client";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
-import { deriveState, runAll } from "@/lib/engine";
+import { deriveState } from "@/lib/engine";
+import { useRunAll } from "@/lib/useRunAll";
 import { big, pc, px, curSym } from "@/lib/format";
 import ModelControls from "@/components/ModelControls";
 import Logo from "@/components/Logo";
@@ -102,8 +103,26 @@ export default function ModelClient() {
     return () => { dead = true; };
   }, [sym]);
 
-  const R = useMemo(() => (state ? runAll(state, scen) : null), [state, scen]);
+  const R = useRunAll(state, scen);
   const cur = state ? curSym(state.hist.currency) : "$";
+
+  // live delta attribution — show how much the last change moved intrinsic value
+  const prevPS = useRef(null);
+  const [delta, setDelta] = useState(null);
+  const deltaTimer = useRef(null);
+  useEffect(() => {
+    if (!R) return;
+    const dd = R.base.dcf, ps = dd.perShare;
+    const bad = !(dd.ev > 0 && ps > 0 && dd.wacc > 0);
+    if (bad || !isFinite(ps)) { prevPS.current = null; setDelta(null); return; }
+    if (prevPS.current != null && Math.abs(ps - prevPS.current) > 0.01) {
+      const abs = ps - prevPS.current;
+      setDelta({ abs, pct: prevPS.current ? abs / prevPS.current : 0 });
+      clearTimeout(deltaTimer.current);
+      deltaTimer.current = setTimeout(() => setDelta(null), 3400);
+    }
+    prevPS.current = ps;
+  }, [R]);
 
   // autosave (debounced)
   useEffect(() => {
@@ -176,7 +195,11 @@ export default function ModelClient() {
             <div className="kpi">
               <div className="smallcaps">{h.name} · intrinsic value</div>
               <div className="val">{notMeaningful ? "n/m" : <AnimatedNumber value={d.perShare} format={(x) => px(x, cur)} />}</div>
-              <div className="sub">per share · {["Base", "Bull", "Bear"][scen]} case DCF</div>
+              <div className="sub" aria-live="polite">
+                {delta && !notMeaningful
+                  ? <span className={delta.abs >= 0 ? "pos" : "neg"}>{delta.abs >= 0 ? "▲ +" : "▼ "}{px(delta.abs, cur)} ({pc(delta.pct)}) from last change</span>
+                  : <>per share · {["Base", "Bull", "Bear"][scen]} case DCF</>}
+              </div>
             </div>
             <div className="kpi">
               <div className="smallcaps">vs. market price {px(h.price, cur)}</div>
@@ -191,6 +214,13 @@ export default function ModelClient() {
           </div>
         </section>
         <div className="sheet">
+          <div className="provenance">
+            <span>Based on {(h.years && h.years[0]) || "recent"}{h.years && h.years.length > 1 && h.years[h.years.length - 1] !== h.years[0] ? `–${h.years[h.years.length - 1]}` : ""} filings</span>
+            <span className="dot">·</span>
+            <span>{h.exchange || state.co?.exchange || "US-listed"} · {h.currency}</span>
+            <span className="dot">·</span>
+            <span>live price {px(h.price, cur)} via Financial Modeling Prep</span>
+          </div>
           <div className="tabbar">
             <div className="tabbar-tabs" role="tablist" aria-label="Analyses">
               {TABS.map((t) => (
@@ -207,6 +237,20 @@ export default function ModelClient() {
               <button className="act" onClick={() => setWizard(true)}>↻ Wizard</button>
             </div>
           </div>
+          {!notMeaningful && (
+            <div className="scen-strip" role="group" aria-label="Compare scenarios">
+              {["Base", "Bull", "Bear"].map((n, i) => {
+                const sd = R.scenarios[i].dcf;
+                return (
+                  <button key={n} className={"scen-chip" + (scen === i ? " on" : "")} aria-pressed={scen === i} onClick={() => setScen(i)}>
+                    <span className="sc-name">{n}</span>
+                    <span className="sc-val">{px(sd.perShare, cur)}</span>
+                    <span className={"sc-up " + (sd.upside >= 0 ? "pos" : "neg")}>{sd.upside >= 0 ? "+" : ""}{pc(sd.upside)}</span>
+                  </button>
+                );
+              })}
+            </div>
+          )}
           {notMeaningful && (
             <div className="fit-warn" role="note">
               <b>Heads up — this model doesn't fit {h.name}.</b> Vexa is built for ordinary operating companies.

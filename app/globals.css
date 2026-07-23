@@ -606,3 +606,19 @@ html[data-theme="dark"] .amb-dot { background: rgba(230,196,143,0.3); }
   .tabbar button, .tabbar-actions .act, .chips button, .site-nav button, .site-nav a { min-height: 42px; }
   .chips button { display: inline-flex; align-items: center; }
 }
+
+/* ===== data provenance line ===== */
+.provenance { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; font-size: 11.5px; color: var(--grey); padding: 0 2px 2px; }
+.provenance .dot { opacity: 0.5; }
+
+/* ===== always-visible scenario comparison strip ===== */
+.scen-strip { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+.scen-chip { display: flex; flex-direction: column; align-items: flex-start; gap: 2px; background: var(--paper); border: 1px solid var(--line); border-radius: 8px; padding: 9px 13px; cursor: pointer; text-align: left; color: var(--ink); transition: border-color 0.2s ease, background 0.2s ease, transform 0.15s ease; }
+.scen-chip:hover { border-color: var(--tan); transform: translateY(-1px); }
+.scen-chip.on { border-color: var(--brown); background: var(--band-alt); }
+html[data-theme="dark"] .scen-chip { background: #201913; }
+html[data-theme="dark"] .scen-chip.on { border-color: var(--navy); }
+.sc-name { font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--grey); font-weight: 600; }
+.sc-val { font-family: var(--serif); font-size: 19px; font-weight: 600; font-variant-numeric: tabular-nums lining-nums; }
+.sc-up { font-size: 12px; font-weight: 600; }
+@media (max-width: 760px) { .scen-chip { padding: 8px 10px; } .sc-val { font-size: 16px; } }
